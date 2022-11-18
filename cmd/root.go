@@ -27,7 +27,7 @@ Welcome to Ansybl! This CLI tool currently has one main function.
 
 1) Monitor for Canto validator uptime and alert via PagerDuty on missing blocks
 
-To get started type 'ansybl init'
+To get started type 'ansybl-cli init'
  `,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:

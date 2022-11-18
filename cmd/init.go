@@ -38,32 +38,35 @@ var initCmd = &cobra.Command{
 	Long: `Enter the following information so we can alert you via PagerDuty when your validator is missing blocks.
 	
 	1) PagerDuty service ID
-	2) PagerDuty email
+	2) PagerDuty email address
 	3) PagerDuty API token`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var pd_service_id string
+		var pd_email string
+		var pd_api_key string
+
 		get_consensus_address()
 
 		fmt.Println("Enter your PagerDuty service ID:")
-		var pd_service_id string
 		fmt.Scanln(&pd_service_id)
-		os.Setenv("PD_SERVICE_ID", pd_service_id)
 
 		fmt.Println("Enter your email that's associated with your PagerDuty account:")
-		var pd_email string
 		fmt.Scanln(&pd_email)
-		os.Setenv("PD_EMAIL", pd_email)
 
 		fmt.Println("Enter your PagerDuty API token:")
-		var pd_api_key string
 		fmt.Scanln(&pd_api_key)
-		os.Setenv("PD_API_KEY", pd_api_key)
 
 		fmt.Println("Press enter to send a test alert.")
 		fmt.Scanln()
+
+		os.Setenv("PD_SERVICE_ID", pd_service_id)
+		os.Setenv("PD_EMAIL", pd_email)
+		os.Setenv("PD_API_KEY", pd_api_key)
+
 		trigger_alarm()
+
 		fmt.Println("If an alert got triggered, setup is complete.")
 		fmt.Println("If you did not see an alert come through, please try again.")
-		get_consensus_address()
 	},
 }
 
@@ -110,11 +113,18 @@ func trigger_alarm() {
 }
 
 func get_consensus_address() {
-	out, err := exec.Command("cantod tendermint show-address").Output()
+	arg0 := "tendermint"
+	arg1 := "show-address"
+	out, err := exec.Command("canto", arg0, arg1).Output()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	os.Setenv("CONSENSUS_ADDRESS", string(out))
 	fmt.Println("Retrieved and set consensus address", string(out))
+}
+
+func set_cron() {
+	// TODO
+	// Implement cron via crontab
 }
