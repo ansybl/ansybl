@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"strconv"
 
 	"github.com/ansybl/ansybl-cli/util"
 	"github.com/spf13/cobra"
@@ -69,7 +70,15 @@ var monitorCmd = &cobra.Command{
 
 		for _, elem := range slashing_info.Info {
 			if elem.Address == config.CONSENSUS_ADDRESS {
-				fmt.Println("Found address in signing info...")
+				blocks_missed, err := strconv.Atoi(elem.MissedBlocksCounter)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if blocks_missed > 0 {
+					trigger_alarm(config.PD_SERVICE_ID, config.PD_EMAIL, config.PD_API_KEY)
+				} else {
+					fmt.Printf("🎉 Validator has not missed signing any blocks! 🎉")
+				}
 			}
 		}
 	},
