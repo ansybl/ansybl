@@ -25,9 +25,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 	"os/exec"
 
+	"github.com/ansybl/ansybl-cli/util"
 	"github.com/spf13/cobra"
 )
 
@@ -54,17 +54,21 @@ var monitorCmd = &cobra.Command{
 	Long: `This command checks if the validator running on this machine has missed signing any blocks. 
 	If it has missed blocks it will trigger a PagerDuty alert.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		address := os.Getenv("CONSENSUS_ADDRESS")
-		info := get_signing_info()
+		config, err := util.LoadConfig(".")
+		if err != nil {
+			log.Fatal("cannot load config: ", err)
+			log.Fatal("Make sure you run init before monitor")
+		}
 
+		info := get_signing_info()
 		var slashing_info SlashingInfo
-		err := json.Unmarshal(info, &slashing_info)
+		err = json.Unmarshal(info, &slashing_info)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		for _, elem := range slashing_info.Info {
-			if elem.Address == address {
+			if elem.Address == config.CONSENSUS_ADDRESS {
 				fmt.Println("Found address in signing info...")
 			}
 		}

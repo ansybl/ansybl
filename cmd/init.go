@@ -29,6 +29,7 @@ import (
 
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var initCmd = &cobra.Command{
@@ -43,8 +44,9 @@ var initCmd = &cobra.Command{
 		var pd_service_id string
 		var pd_email string
 		var pd_api_key string
+		var consensus_address string
 
-		get_consensus_address()
+		consensus_address = get_consensus_address()
 
 		fmt.Println("Enter your PagerDuty service ID:")
 		fmt.Scanln(&pd_service_id)
@@ -58,9 +60,11 @@ var initCmd = &cobra.Command{
 		fmt.Println("Press enter to send a test alert.")
 		fmt.Scanln()
 
-		os.Setenv("PD_SERVICE_ID", pd_service_id)
-		os.Setenv("PD_EMAIL", pd_email)
-		os.Setenv("PD_API_KEY", pd_api_key)
+		viper.Set("PD_SERVICE_ID", pd_service_id)
+		viper.Set("PD_EMAIL", pd_email)
+		viper.Set("PD_API_KEY", pd_api_key)
+		viper.Set("CONSENSUS_ADDRESS", consensus_address)
+		viper.WriteConfigAs("app.env")
 
 		trigger_alarm()
 
@@ -101,7 +105,7 @@ func trigger_alarm() {
 	fmt.Println(resp)
 }
 
-func get_consensus_address() {
+func get_consensus_address() string {
 	arg0 := "tendermint"
 	arg1 := "show-address"
 	out, err := exec.Command("cantod", arg0, arg1).Output()
@@ -109,8 +113,9 @@ func get_consensus_address() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	os.Setenv("CONSENSUS_ADDRESS", string(out))
+
 	fmt.Println("Retrieved and set consensus address to ", string(out))
+	return string(out)
 }
 
 func set_cron() {
