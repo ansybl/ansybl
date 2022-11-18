@@ -16,6 +16,6 @@ This CLI tool is intended to make the lives of validator node operators easier
 
 ### Install
 
-`git clone https://github.com/ansybl/ansybl-cli.git`
+`git clone https://github.com/ansybl/ansybl.git`
 `go build`
-`./ansybl-cli init`
+`./ansybl init`

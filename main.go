@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ansybl/ansybl-cli/cmd"
+import "github.com/ansybl/ansybl/cmd"
 
 func main() {
 	cmd.Execute()

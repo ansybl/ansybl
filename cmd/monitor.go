@@ -28,7 +28,7 @@ import (
 	"os/exec"
 	"strconv"
 
-	"github.com/ansybl/ansybl-cli/util"
+	"github.com/ansybl/ansybl/util"
 	"github.com/spf13/cobra"
 )
 
@@ -77,7 +77,7 @@ var monitorCmd = &cobra.Command{
 				if blocks_missed > 0 {
 					trigger_alarm(config.PD_SERVICE_ID, config.PD_EMAIL, config.PD_API_KEY)
 				} else {
-					fmt.Printf("🎉 Validator has not missed signing any blocks! 🎉")
+					fmt.Println("🎉 Validator has not missed signing any blocks! 🎉")
 				}
 			}
 		}

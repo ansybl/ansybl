@@ -1,4 +1,4 @@
-module github.com/ansybl/ansybl-cli
+module github.com/ansybl/ansybl
 
 go 1.18
 
