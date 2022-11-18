@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 
 	"github.com/spf13/cobra"
@@ -53,6 +54,7 @@ var monitorCmd = &cobra.Command{
 	Long: `This command checks if the validator running on this machine has missed signing any blocks. 
 	If it has missed blocks it will trigger a PagerDuty alert.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		address := os.Getenv("CONSENSUS_ADDRESS")
 		info := get_signing_info()
 
 		var slashing_info SlashingInfo
@@ -60,7 +62,12 @@ var monitorCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%+v\n", slashing_info)
+
+		for _, elem := range slashing_info.Info {
+			if elem.Address == address {
+				fmt.Println("Found address in signing info...")
+			}
+		}
 	},
 }
 
