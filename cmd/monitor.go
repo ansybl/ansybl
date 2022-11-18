@@ -22,6 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os/exec"
@@ -36,7 +37,11 @@ var monitorCmd = &cobra.Command{
 	If it has missed blocks it will trigger a PagerDuty alert.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		info := get_signing_info()
-		fmt.Println(info)
+		b, err := json.Marshal(info)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(b)
 	},
 }
 
@@ -54,17 +59,18 @@ func init() {
 	// monitorCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func get_signing_info() string {
+func get_signing_info() []byte {
 	arg0 := "query"
 	arg1 := "slashing"
 	arg2 := "signing-infos"
-	arg3 := "--limit 200"
-	arg4 := "--output json"
-	out, err := exec.Command("cantod", arg0, arg1, arg2, arg3, arg4).Output()
+	arg3 := "--limit"
+	arg4 := "200"
+	arg5 := "--output"
+	arg6 := "json"
+	out, err := exec.Command("cantod", arg0, arg1, arg2, arg3, arg4, arg5, arg6).Output()
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	return string(out)
+	return out
 }
