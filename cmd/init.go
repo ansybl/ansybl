@@ -68,6 +68,7 @@ var initCmd = &cobra.Command{
 
 		trigger_alarm(pd_service_id, pd_email, pd_api_key)
 
+		fmt.Println("Test alert sent!")
 		fmt.Println("If an alert got triggered, setup is complete.")
 		fmt.Println("If you did not see an alert come through, please try again.")
 	},
@@ -96,10 +97,9 @@ func trigger_alarm(service_id string, email string, authtoken string) {
 	}
 
 	resp, err := client.CreateIncident(email, &incident)
-	if err != nil {
+	if err != nil || resp == nil {
 		panic(err)
 	}
-	fmt.Println(resp)
 }
 
 func get_consensus_address() string {
@@ -114,9 +114,4 @@ func get_consensus_address() string {
 	fmt.Println("Retrieved and set consensus address to ", string(out))
 	address := string(out)
 	return strings.TrimSpace(address)
-}
-
-func set_cron() {
-	// TODO
-	// Implement cron via crontab
 }
