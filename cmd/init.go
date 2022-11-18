@@ -24,8 +24,8 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/PagerDuty/go-pagerduty"
 	"github.com/spf13/cobra"
@@ -66,7 +66,7 @@ var initCmd = &cobra.Command{
 		viper.Set("CONSENSUS_ADDRESS", consensus_address)
 		viper.WriteConfigAs("app.env")
 
-		trigger_alarm()
+		trigger_alarm(pd_service_id, pd_email, pd_api_key)
 
 		fmt.Println("If an alert got triggered, setup is complete.")
 		fmt.Println("If you did not see an alert come through, please try again.")
@@ -77,10 +77,7 @@ func init() {
 	rootCmd.AddCommand(initCmd)
 }
 
-func trigger_alarm() {
-	var email = os.Getenv("PD_EMAIL")
-	var service_id = os.Getenv("PD_SERVICE_ID")
-	var authtoken = os.Getenv("PD_API_KEY")
+func trigger_alarm(service_id string, email string, authtoken string) {
 
 	client := pagerduty.NewClient(authtoken)
 	service := pagerduty.APIReference{
@@ -115,7 +112,8 @@ func get_consensus_address() string {
 	}
 
 	fmt.Println("Retrieved and set consensus address to ", string(out))
-	return string(out)
+	address := string(out)
+	return strings.TrimSpace(address)
 }
 
 func set_cron() {
