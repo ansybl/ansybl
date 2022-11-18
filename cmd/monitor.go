@@ -30,6 +30,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type Pagination struct {
+	NextKey string `json:"next_key"`
+	Total   string `json:"total"`
+}
+type AddressInfo struct {
+	Address             string `json:"address"`
+	StartHeight         string `json:"start_height"`
+	IndexOffset         string `json:"index_offset"`
+	JailedUntil         string `json:"jailed_until"`
+	Tomstoned           bool   `json:"tomstoned"`
+	MissedBlocksCounter string `json:"missed_blocks_counter"`
+}
+type SlashingInfo struct {
+	Info       []AddressInfo `json:"info"`
+	Pagination Pagination    `json:"pagination"`
+}
+
 var monitorCmd = &cobra.Command{
 	Use:   "monitor",
 	Short: "Checks for missed blocks",
@@ -37,26 +54,18 @@ var monitorCmd = &cobra.Command{
 	If it has missed blocks it will trigger a PagerDuty alert.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		info := get_signing_info()
-		b, err := json.Marshal(info)
+
+		var slashing_info SlashingInfo
+		err := json.Unmarshal(info, &slashing_info)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(b)
+		fmt.Printf("%+v\n", slashing_info)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(monitorCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// monitorCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// monitorCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func get_signing_info() []byte {
