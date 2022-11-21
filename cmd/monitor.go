@@ -61,11 +61,13 @@ var monitorCmd = &cobra.Command{
 			log.Fatal("Make sure you run init before monitor")
 		}
 
-		info := get_signing_info()
+		info := get_signing_info(config)
 		var slashing_info SlashingInfo
 		err = json.Unmarshal(info, &slashing_info)
 		if err != nil {
 			log.Fatal(err)
+			alert_title := "Canto validator with address " + config.CONSENSUS_ADDRESS + "had an error Unmarshaling JSON object."
+			trigger_alarm(config.PD_SERVICE_ID, config.PD_EMAIL, config.PD_API_KEY, alert_title, err.Error())
 		}
 
 		for _, elem := range slashing_info.Info {
@@ -75,7 +77,8 @@ var monitorCmd = &cobra.Command{
 					log.Fatal(err)
 				}
 				if blocks_missed > 0 {
-					trigger_alarm(config.PD_SERVICE_ID, config.PD_EMAIL, config.PD_API_KEY)
+					alert_body := "Canto validator with address " + config.CONSENSUS_ADDRESS + " has missed signing " + strconv.Itoa(blocks_missed) + " blocks."
+					trigger_alarm(config.PD_SERVICE_ID, config.PD_EMAIL, config.PD_API_KEY, "Canto validator missing blocks!", alert_body)
 				} else {
 					fmt.Println("🎉 Validator has not missed signing any blocks! 🎉")
 				}
@@ -88,7 +91,7 @@ func init() {
 	rootCmd.AddCommand(monitorCmd)
 }
 
-func get_signing_info() []byte {
+func get_signing_info(config util.Config) []byte {
 	arg0 := "query"
 	arg1 := "slashing"
 	arg2 := "signing-infos"
@@ -100,6 +103,8 @@ func get_signing_info() []byte {
 
 	if err != nil {
 		log.Fatal(err)
+		alert_title := "Canto validator with address " + config.CONSENSUS_ADDRESS + " had an error getting signing info."
+		trigger_alarm(config.PD_SERVICE_ID, config.PD_EMAIL, config.PD_API_KEY, alert_title, err.Error())
 	}
 	return out
 }

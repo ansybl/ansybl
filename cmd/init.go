@@ -66,7 +66,7 @@ var initCmd = &cobra.Command{
 		viper.Set("CONSENSUS_ADDRESS", consensus_address)
 		viper.WriteConfigAs("app.env")
 
-		trigger_alarm(pd_service_id, pd_email, pd_api_key)
+		trigger_alarm(pd_service_id, pd_email, pd_api_key, "Test alert from Ansybl CLI", "This is a test alert triggered from the initialization of the Ansybl CLI.")
 
 		fmt.Println("Test alert sent!")
 		fmt.Println("If an alert got triggered, setup is complete.")
@@ -78,7 +78,7 @@ func init() {
 	rootCmd.AddCommand(initCmd)
 }
 
-func trigger_alarm(service_id string, email string, authtoken string) {
+func trigger_alarm(service_id string, email string, authtoken string, alert_title string, alert_body string) {
 
 	client := pagerduty.NewClient(authtoken)
 	service := pagerduty.APIReference{
@@ -87,11 +87,11 @@ func trigger_alarm(service_id string, email string, authtoken string) {
 	}
 	body := pagerduty.APIDetails{
 		Type:    "incident_body",
-		Details: "Canto node is missing blocks!",
+		Details: alert_body,
 	}
 	incident := pagerduty.CreateIncidentOptions{
 		Type:    "incident",
-		Title:   "Canto node is missing blocks",
+		Title:   alert_title,
 		Service: &service,
 		Body:    &body,
 	}
